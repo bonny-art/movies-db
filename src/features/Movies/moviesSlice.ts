@@ -14,34 +14,49 @@ export interface Movie {
 interface MovieState {
   top: Movie[];
   loading: boolean;
+  page: number;
+  hasMorePages: boolean;
 }
 
 const initialState: MovieState = {
   top: [],
   loading: false,
+  page: 0,
+  hasMorePages: true,
 };
 
 const moviesLoading = () => ({
   type: "movies/loading",
 });
 
-const moviesLoaded = (movies: Movie[]) => ({
+const moviesLoaded = (
+  movies: Movie[],
+  page: number,
+  hasMorePages: boolean
+) => ({
   type: "movies/loaded",
-  payload: movies,
+  payload: { movies, page, hasMorePages },
 });
 
-export function fetchMovies(): AppThunk<Promise<void>> {
+export function fetchNextPage(): AppThunk<Promise<void>> {
   return async (dispatch, getState) => {
+    const nextPage = getState().movies.page + 1;
+    dispatch(fetchPage(nextPage));
+  };
+}
+
+function fetchPage(page: number): AppThunk<Promise<void>> {
+  return async (dispatch) => {
     dispatch(moviesLoading());
 
     const config = await client.getConfiguration();
-    const results = await client.getNowPlaying();
+    const nowPlaying = await client.getNowPlaying(page);
 
     const imageSize = "w780";
 
     const imageUrl = config.images.base_url;
 
-    const mappedResults: Movie[] = results.map((m) => ({
+    const mappedResults: Movie[] = nowPlaying.results.map((m) => ({
       id: m.id,
       title: m.title,
       overview: m.overview,
@@ -51,7 +66,9 @@ export function fetchMovies(): AppThunk<Promise<void>> {
         : undefined,
     }));
 
-    dispatch(moviesLoaded(mappedResults));
+    const hasMorePages = nowPlaying.page < nowPlaying.totalPages;
+
+    dispatch(moviesLoaded(mappedResults, page, hasMorePages));
   };
 }
 
@@ -62,10 +79,19 @@ const moviesReducer = createReducer<MovieState>(initialState, {
       loading: true,
     };
   },
-  "movies/loaded": (state, action: ActionWithPayload<Movie[]>) => {
+  "movies/loaded": (
+    state,
+    action: ActionWithPayload<{
+      movies: Movie[];
+      page: number;
+      hasMorePages: boolean;
+    }>
+  ) => {
     return {
       ...state,
-      top: action.payload,
+      top: [...state.top, ...action.payload.movies],
+      page: action.payload.page,
+      hasMorePages: action.payload.hasMorePages,
       loading: false,
     };
   },
