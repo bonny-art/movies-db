@@ -1,7 +1,9 @@
 import { ActionWithPayload, createReducer } from "../redux/utils";
 
-import { client } from "../../api/tmdb";
+import { MoviesFilters, client } from "../../api/tmdb";
 import { AppThunk } from "../../store";
+
+import { genres } from "./genres";
 
 export interface Movie {
   id: number;
@@ -11,11 +13,17 @@ export interface Movie {
   image?: string;
 }
 
+export interface Genre {
+  id: number;
+  name: string;
+}
+
 interface MovieState {
   top: Movie[];
   loading: boolean;
   page: number;
   hasMorePages: boolean;
+  genres: Genre[];
 }
 
 const initialState: MovieState = {
@@ -23,6 +31,7 @@ const initialState: MovieState = {
   loading: false,
   page: 0,
   hasMorePages: true,
+  genres,
 };
 
 const moviesLoading = () => ({
@@ -38,25 +47,38 @@ const moviesLoaded = (
   payload: { movies, page, hasMorePages },
 });
 
-export function fetchNextPage(): AppThunk<Promise<void>> {
+//TODO add this code to the camper-rental-app project so that when you return to the page Catalog, the state is updated and the filters are not applied
+
+export const resetMovies = () => ({
+  type: "movies/reset",
+});
+
+export function fetchNextPage(
+  filters: MoviesFilters = {}
+): AppThunk<Promise<void>> {
   return async (dispatch, getState) => {
     const nextPage = getState().movies.page + 1;
-    dispatch(fetchPage(nextPage));
+    dispatch(fetchPage(nextPage, filters));
   };
 }
 
-function fetchPage(page: number): AppThunk<Promise<void>> {
+function fetchPage(
+  page: number,
+  filters: MoviesFilters
+): AppThunk<Promise<void>> {
   return async (dispatch) => {
     dispatch(moviesLoading());
 
+    // todo: single load per app
     const config = await client.getConfiguration();
-    const nowPlaying = await client.getNowPlaying(page);
+
+    const moviesResponse = await client.getMovies(page, filters);
 
     const imageSize = "w780";
 
     const imageUrl = config.images.base_url;
 
-    const mappedResults: Movie[] = nowPlaying.results.map((m) => ({
+    const mappedResults: Movie[] = moviesResponse.results.map((m) => ({
       id: m.id,
       title: m.title,
       overview: m.overview,
@@ -66,7 +88,7 @@ function fetchPage(page: number): AppThunk<Promise<void>> {
         : undefined,
     }));
 
-    const hasMorePages = nowPlaying.page < nowPlaying.totalPages;
+    const hasMorePages = moviesResponse.page < moviesResponse.totalPages;
 
     dispatch(moviesLoaded(mappedResults, page, hasMorePages));
   };
@@ -94,6 +116,11 @@ const moviesReducer = createReducer<MovieState>(initialState, {
       hasMorePages: action.payload.hasMorePages,
       loading: false,
     };
+  },
+  //TODO add this code to the camper-rental-app project so that when you return to the page Catalog, the state is updated and the filters are not applied
+
+  "movies/reset": (state) => {
+    return { ...initialState };
   },
 });
 

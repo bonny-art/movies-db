@@ -44,6 +44,16 @@ interface Configuration {
   };
 }
 
+export interface KeywordItem {
+  id: number;
+  name: string;
+}
+
+export interface MoviesFilters {
+  keywords?: number[];
+  genres?: number[];
+}
+
 export const client = {
   async getConfiguration() {
     return get<Configuration>("/configuration");
@@ -59,5 +69,39 @@ export const client = {
       page: response.page,
       totalPages: response.total_pages,
     };
+  },
+
+  async getMovies(page: number, filters: MoviesFilters) {
+    const params = new URLSearchParams({
+      page: page.toString(),
+    });
+
+    if (filters.keywords?.length) {
+      params.append("with_keywords", filters.keywords.join("|"));
+    }
+
+    if (filters.genres?.length) {
+      params.append("with_genres", filters.genres.join(","));
+    }
+
+    const query = params.toString();
+
+    const response = await get<PageResponse<MovieDetails>>(
+      `/discover/movie?${query}`
+    );
+
+    return {
+      results: response.results,
+      page: response.page,
+      totalPages: response.total_pages,
+    };
+  },
+
+  async getKeywords(query: string) {
+    const response = await get<PageResponse<KeywordItem>>(
+      `/search/keyword?query=${query}`
+    );
+
+    return response.results;
   },
 };
