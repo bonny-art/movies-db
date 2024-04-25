@@ -1,13 +1,22 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import {
+  Suspense,
+  lazy,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { fetchNextPage, resetMovies } from "./moviesSlice";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import { Container, Grid, LinearProgress, Typography } from "@mui/material";
 import { AuthContext, anonymousUser } from "../../AuthContext";
 import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
-import { Filters, MoviesFilter } from "./MoviesFilter";
+import { Filters } from "./MoviesFilter";
 import MovieCard from "./MovieCard";
 
-function Movies() {
+const MoviesFilter = lazy(() => import("./MoviesFilter"));
+
+export default function Movies() {
   const dispatch = useAppDispatch();
   const movies = useAppSelector((state) => state.movies.top);
   const loading = useAppSelector((state) => state.movies.loading);
@@ -50,12 +59,14 @@ function Movies() {
   return (
     <Grid container spacing={2} sx={{ flexWrap: "nowrap" }}>
       <Grid item xs="auto">
-        <MoviesFilter
-          onApply={(f) => {
-            dispatch(resetMovies());
-            setFilters(f);
-          }}
-        />
+        <Suspense fallback={<span>Loading filters...</span>}>
+          <MoviesFilter
+            onApply={(f) => {
+              dispatch(resetMovies());
+              setFilters(f);
+            }}
+          />
+        </Suspense>
       </Grid>
 
       <Grid item xs={12}>
@@ -90,5 +101,3 @@ function Movies() {
     </Grid>
   );
 }
-
-export default Movies;

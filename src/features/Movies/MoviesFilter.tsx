@@ -25,7 +25,7 @@ interface MoviesFilterProps {
   onApply(filters: Filters): void;
 }
 
-export function MoviesFilter({ onApply }: MoviesFilterProps) {
+function MoviesFilter({ onApply }: MoviesFilterProps) {
   const [keywordsLoading, setKeywordsLoading] = useState(false);
   const [keywordsOptions, setKeywordsOptions] = useState<KeywordItem[]>([]);
 
@@ -143,3 +143,5 @@ export function MoviesFilter({ onApply }: MoviesFilterProps) {
     </Paper>
   );
 }
+
+export default MoviesFilter;
