@@ -1,5 +1,7 @@
 import configuration from "../configuration";
 
+const apiBasePath = `${configuration.apiUrl}/3`;
+
 async function get<TBody>(relativeUrl: string): Promise<TBody> {
   const options = {
     method: "GET",
@@ -9,10 +11,7 @@ async function get<TBody>(relativeUrl: string): Promise<TBody> {
     },
   };
 
-  const response = await fetch(
-    `${configuration.apiUrl}/3${relativeUrl}`,
-    options
-  );
+  const response = await fetch(`${apiBasePath}${relativeUrl}`, options);
   const json: TBody = await response.json();
 
   return json;
