@@ -18,6 +18,7 @@ import { ErrorBoundary } from "./ErrorBoundary";
 import { LinearProgress } from "@mui/material";
 
 const Movies = lazy(() => import("./features/Movies/Movies"));
+const Extra = lazy(() => import("./features/Extra/Extra"));
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -47,6 +48,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LinearProgress sx={{ mt: 1 }} />}>
             <Movies />
+          </Suspense>
+        ),
+      },
+      {
+        path: "extra",
+        element: (
+          <Suspense fallback={<LinearProgress sx={{ mt: 1 }} />}>
+            <Extra />
           </Suspense>
         ),
       },
