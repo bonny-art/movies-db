@@ -1,17 +1,7 @@
-import {
-  Suspense,
-  lazy,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { fetchNextPage, resetMovies } from "./moviesSlice";
-import { useAppDispatch, useAppSelector } from "../../hooks";
+import { Suspense, lazy, useCallback, useContext, useState } from "react";
 import { Container, Grid, LinearProgress, Typography } from "@mui/material";
 import { AuthContext, anonymousUser } from "../../AuthContext";
 import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
-import { Filters } from "./MoviesFilter";
 import MovieCard from "./MovieCard";
 import {
   MoviesFilters,

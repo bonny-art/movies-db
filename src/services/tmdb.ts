@@ -37,7 +37,7 @@ export interface MoviesQuery {
   filters: MoviesFilters;
 }
 
-interface KeywordItem {
+export interface KeywordItem {
   id: number;
   name: string;
 }
@@ -53,7 +53,7 @@ export const tmdbApi = createApi({
     baseUrl: `${configuration.apiUrl}/3`,
     prepareHeaders(headers) {
       headers.set("Accept", "application/json");
-      headers.set("Authurozation", `Bearer ${configuration.apiToken}`);
+      headers.set("Authorization", `Bearer ${configuration.apiToken}`);
     },
   }),
   endpoints: (builder) => ({
@@ -81,11 +81,31 @@ export const tmdbApi = createApi({
 
         return `/discover/movie?${query}`;
       },
+
       transformResponse: (response: PageResponse<MovieDetails>, _, arg) => ({
         results: response.results,
-        lastPage: response.page,
+        lastPage: arg.page,
         hasMorePages: arg.page < response.total_pages,
       }),
+
+      serializeQueryArgs({ endpointName }) {
+        return endpointName;
+      },
+
+      merge(currentCasheData, responseData) {
+        if (responseData.lastPage === 1) {
+          currentCasheData.results = responseData.results;
+        } else {
+          currentCasheData.results.push(...responseData.results);
+        }
+
+        currentCasheData.lastPage = responseData.lastPage;
+        currentCasheData.hasMorePages = responseData.hasMorePages;
+      },
+
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
+      },
     }),
 
     getKeywords: builder.query<KeywordItem[], string>({

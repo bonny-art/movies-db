@@ -20,12 +20,6 @@ export function useIntersectionObserver(options: Options = {}): HookReturnType {
 
   const [entry, setEntry] = useState<IntersectionObserverEntry>();
 
-  const callbackFn = (entries: IntersectionObserverEntry[]) => {
-    const [entry] = entries;
-
-    setEntry(entry);
-  };
-
   useEffect(() => {
     const currentRef = targetRef.current;
 
