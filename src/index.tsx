@@ -16,6 +16,11 @@ import store from "./store";
 import Home from "./features/Home/Home";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { LinearProgress } from "@mui/material";
+import { StatefulAuthProvider } from "./auth/StatefulAuthProvider";
+import { AuthCallback } from "./auth/AuthCallback";
+import { Profile } from "./features/Profile/Profile";
+import { AuthenticationGuard } from "./auth/AuthenticationGuard";
+import { Protected } from "./features/Protected/Protected";
 
 const Movies = lazy(() => import("./features/Movies/Movies"));
 const Extra = lazy(() => import("./features/Extra/Extra"));
@@ -26,11 +31,13 @@ const root = ReactDOM.createRoot(
 
 function AppEntrypoint() {
   return (
-    <Provider store={store}>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
-    </Provider>
+    <StatefulAuthProvider>
+      <Provider store={store}>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </Provider>
+    </StatefulAuthProvider>
   );
 }
 
@@ -60,8 +67,20 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/profile",
+        element: <AuthenticationGuard component={Profile} />,
+      },
+      {
+        path: "/protected",
+        element: <AuthenticationGuard component={Protected} />,
+      },
+      {
         path: "/about",
         element: <About />,
+      },
+      {
+        path: "/callback",
+        element: <AuthCallback />,
       },
     ],
   },

@@ -1,6 +1,5 @@
-import { Suspense, lazy, useCallback, useContext, useState } from "react";
+import { Suspense, lazy, useCallback, useState } from "react";
 import { Container, Grid, LinearProgress, Typography } from "@mui/material";
-import { AuthContext, anonymousUser } from "../../AuthContext";
 import { useIntersectionObserver } from "../../hooks/useIntersectionObserver";
 import MovieCard from "./MovieCard";
 import {
@@ -9,6 +8,7 @@ import {
   useGetConfigurationQuery,
   useGetMoviesQuery,
 } from "../../services/tmdb";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const MoviesFilter = lazy(() => import("./MoviesFilter"));
 
@@ -33,8 +33,7 @@ export default function Movies() {
     return path && configuration ? `${imageUrl}${imageSize}${path}` : undefined;
   }
 
-  const { user } = useContext(AuthContext);
-  const loggedIn = user !== anonymousUser;
+  const { isAuthenticated, user } = useAuth0();
 
   const onIntersect = useCallback(() => {
     if (hasMorePages) {
@@ -47,10 +46,10 @@ export default function Movies() {
   const handleAddFavorite = useCallback(
     (id: number) => {
       alert(
-        `Not implemented! Action: ${user.name} is adding movie ${id} to favorites.`
+        `Not implemented! Action: ${user?.name} is adding movie ${id} to favorites.`
       );
     },
-    [user.name]
+    [user?.name]
   );
 
   return (
@@ -91,7 +90,7 @@ export default function Movies() {
                   overview={m.overview}
                   popularity={m.popularity}
                   image={formatImageUrl(m.backdrop_path)}
-                  enableUsersActions={loggedIn}
+                  enableUsersActions={isAuthenticated}
                   onAddFavorite={handleAddFavorite}
                 />
               </Grid>

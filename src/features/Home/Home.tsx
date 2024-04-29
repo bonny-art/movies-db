@@ -1,7 +1,6 @@
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
-import { useContext } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import { AuthContext, anonymousUser } from "../../AuthContext";
+import { useAuth0 } from "@auth0/auth0-react";
 
 function Copyright() {
   return (
@@ -12,12 +11,10 @@ function Copyright() {
 }
 
 export default function Home() {
-  const { user } = useContext(AuthContext);
-  const loggedIn = user !== anonymousUser;
-  const { name } = user;
+  const { isAuthenticated, user } = useAuth0();
 
-  const greeting = loggedIn
-    ? `${name}, explore movies today with us!`
+  const greeting = isAuthenticated
+    ? `${user?.name}, explore movies today with us!`
     : "Explore movies today with us!";
 
   // throw new Error("Error!!!");
