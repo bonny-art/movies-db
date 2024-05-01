@@ -9,7 +9,7 @@ import { EpisodeCard } from "./EpisodeCard";
 
 const defaultQuery = { page: 1 };
 
-export default function Extra() {
+export function Extra() {
   const [query, setQuery] = useState<EpisodesQuery>(defaultQuery);
   const { data, isFetching } = useGetEpisodesQuery(query);
 

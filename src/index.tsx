@@ -21,9 +21,9 @@ import { AuthCallback } from "./auth/AuthCallback";
 import { Profile } from "./features/Profile/Profile";
 import { AuthenticationGuard } from "./auth/AuthenticationGuard";
 import { Protected } from "./features/Protected/Protected";
+import { Extra } from "./features/Extra/Extra";
 
 const Movies = lazy(() => import("./features/Movies/Movies"));
-const Extra = lazy(() => import("./features/Extra/Extra"));
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -60,11 +60,7 @@ const router = createBrowserRouter([
       },
       {
         path: "extra",
-        element: (
-          <Suspense fallback={<LinearProgress sx={{ mt: 1 }} />}>
-            <Extra />
-          </Suspense>
-        ),
+        element: <Extra />,
       },
       {
         path: "/profile",

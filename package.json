@@ -12,10 +12,10 @@
     "@redux-devtools/extension": "^3.3.0",
     "@reduxjs/toolkit": "^2.2.3",
     "@rtk-query/graphql-request-base-query": "^2.3.1",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^29.5.11",
     "@types/node": "^16.18.96",
     "@types/react": "^18.2.78",
     "@types/react-dom": "^18.2.25",
@@ -59,7 +59,15 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/leaflet": "^1.9.11",
+    "msw": "^2.0.14",
+    "undici": "^5.28.2",
     "sass": "^1.75.0"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@bundled-es-modules)/)"
+    ]
   }
 }

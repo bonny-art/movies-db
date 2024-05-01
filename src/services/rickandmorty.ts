@@ -24,7 +24,7 @@ export interface Episode {
 }
 
 export interface Character {
-  id: number;
+  id: string;
   name: string;
   image: string;
 }
@@ -37,30 +37,28 @@ export const rickandmortyApi = createApi({
 
   endpoints: (builder) => ({
     getEpisodes: builder.query<EpisodesState, EpisodesQuery>({
-      query({ page }) {
-        return {
-          document: gql`
-            query GetEpisodesPage($page: Int) {
-              episodes(page: $page) {
-                results {
+      query: ({ page }: EpisodesQuery) => ({
+        document: gql`
+          query GetEpisodesPage($page: Int) {
+            episodes(page: $page) {
+              results {
+                name
+                air_date
+                episode
+                characters {
+                  id
                   name
-                  air_date
-                  episode
-                  characters {
-                    id
-                    name
-                    image
-                  }
+                  image
                 }
               }
             }
-          `,
+          }
+        `,
 
-          variables: {
-            page,
-          },
-        };
-      },
+        variables: {
+          page,
+        },
+      }),
 
       transformResponse(response: EpisodesResponse) {
         return { results: response.episodes.results };
